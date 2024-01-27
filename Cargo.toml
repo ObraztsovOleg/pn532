@@ -1,0 +1,40 @@
+[package]
+name = "pn532"
+description = "PN532 protocol implementation"
+version = "0.3.2"
+edition = "2021"
+repository = "https://github.com/WMT-GmbH/pn532"
+license = "MIT OR Apache-2.0"
+categories = [
+    "hardware-support",
+    "no-std",
+    "asynchronous",
+    "embedded"
+]
+keywords = [
+    "embedded-hal",
+    "PN532",
+]
+
+[dependencies]
+embedded-hal = { version = "0.2.6", features = ["unproven"] }
+nb = "1.0.0"
+void = { version = "1.0.2", default_features = false }
+serialport = { version = "4.0.1", optional = true }
+
+[features]
+msb-spi = []
+std = ["serialport"]
+
+[package.metadata.docs.rs]
+all-features = true
+
+[[example]]
+name = "hsu-test-util"
+required-features = ["std"]
+
+[dev-dependencies]
+# hsu-test-serialport
+log = "0.4"
+env_logger = "0.7"
+clap = "2.33.3"
