@@ -61,7 +61,7 @@ where
     fn read(&mut self, buf: &mut [u8]) -> Result<(), Self::Error> {
         self.i2c.exec(
             I2C_ADDRESS,
-            &mut [Operation::Read(buf)],
+            &mut [Operation::Read(&mut [0]), Operation::Read(buf)],
         )
     }
 }
@@ -106,7 +106,7 @@ where
     fn read(&mut self, buf: &mut [u8]) -> Result<(), Self::Error> {
         self.i2c.exec(
             I2C_ADDRESS,
-            &mut [Operation::Read(buf)],
+            &mut [Operation::Read(&mut [0]), Operation::Read(buf)],
         )
     }
 }

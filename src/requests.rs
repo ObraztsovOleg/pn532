@@ -30,9 +30,8 @@ impl<const N: usize> Request<N> {
 
 impl Request<0> {
     pub const GET_FIRMWARE_VERSION: Request<0> = Request::new(Command::GetFirmwareVersion, []);
-    pub const GET_GENERAL_STATUS: Request<0> = Request::new(Command::GetGeneralStatus, []);
     pub const INLIST_ONE_ISO_A_TARGET: Request<2> =
-        Request::new(Command::InListPassiveTarget, [0x01, CardType::IsoTypeA as u8]);
+        Request::new(Command::InListPassiveTarget, [1, CardType::IsoTypeA as u8]);
 
     pub const SELECT_TAG_1: Request<1> = Request::new(Command::InSelect, [1]);
     pub const SELECT_TAG_2: Request<1> = Request::new(Command::InSelect, [2]);
@@ -44,14 +43,14 @@ impl Request<0> {
     pub const fn sam_configuration(mode: SAMMode, use_irq_pin: u8) -> Request<3> {
         // TODO use_irq_pin seems to not have any effect
         let (mode, timeout) = match mode {
-            SAMMode::Normal => (0x01, 0x14),
+            SAMMode::Normal => (1, 0),
             SAMMode::VirtualCard { timeout } => (2, timeout),
             SAMMode::WiredCard => (3, 0),
             SAMMode::DualCard => (4, 0),
         };
         Request::new(
             Command::SAMConfiguration,
-            [mode, timeout, use_irq_pin as u8],
+            [mode, timeout, use_irq_pin],
         )
     }
 
@@ -68,6 +67,12 @@ impl Request<0> {
             [0x01, NTAGCommand::Read as u8, page],
         )
     }
+    pub const fn exchange_data (data: u8) -> Request<1> {
+        Request::new(
+            Command::InDataExchange,
+            [data],
+        )
+    }
     pub const fn ntag_write(page: u8, bytes: &[u8; 4]) -> Request<7> {
         Request::new(
             Command::InDataExchange,
@@ -82,16 +87,6 @@ impl Request<0> {
             ],
         )
     }
-
-    pub const fn exchange_data (tag_number: u8) -> Request<1> {
-        Request::new(
-            Command::InDataExchange,
-            [
-                tag_number
-            ],
-        )
-    }
-
     pub const fn ntag_pwd_auth(bytes: &[u8; 4]) -> Request<5> {
         Request::new(
             Command::InCommunicateThru,

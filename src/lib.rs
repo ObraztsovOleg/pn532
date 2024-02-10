@@ -248,3 +248,7 @@ impl IntoDuration for u64 {
         Duration::from_micros(self)
     }
 }
+
+#[doc(hidden)]
+// FIXME: #[cfg(doctest)] once https://github.com/rust-lang/rust/issues/67295 is fixed.
+pub mod doc_test_helper;

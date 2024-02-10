@@ -111,12 +111,11 @@ impl<I: Interface, T: CountDown, const N: usize> Pn532<I, T, N> {
         self.receive_ack()?;
         while self.interface.wait_ready()?.is_pending() {
             if self.timer.wait().is_ok() {
-                return Err(Error::TimeoutAck);
+                return Err(Error::TimeoutResponse);
             }
         }
         self.receive_response(sent_command, response_len)
     }
-
 
     #[inline]
     pub fn in_data_exchange< const M: usize>(
@@ -143,7 +142,6 @@ impl<I: Interface, T: CountDown, const N: usize> Pn532<I, T, N> {
             }
         }
 
-        // self.receive_big_response(my_buf)
         self.receive_response(sent_command, response_len)
     }
 
@@ -181,7 +179,6 @@ impl<I: Interface, T: CountDown, const N: usize> Pn532<I, T, N> {
         self.receive_ack()
     }
 }
-
 impl<I: Interface, T, const N: usize> Pn532<I, T, N> {
     /// Create a Pn532 instance
     pub fn new(interface: I, timer: T) -> Self {
@@ -316,15 +313,6 @@ impl<I: Interface, T, const N: usize> Pn532<I, T, N> {
         parse_response(response_buf, expected_response_command)
     }
 
-    pub fn receive_big_response<'a>(
-        &'a mut self,
-        my_buff: &'a mut [u8],
-    ) -> Result<(), Error<I::Error>> {
-        self.interface.read( my_buff)?;
-
-        Ok(())
-    }
-
     /// Send an ACK frame to force the PN532 to abort the current process.
     /// In that case, the PN532 discontinues the last processing and does not answer anything
     /// to the host controller.
@@ -452,8 +440,6 @@ fn parse_response<E: Debug>(
     }
     // Adjust response buf and return it
     Ok(&response_buf[7..5 + frame_len as usize])
-
-    // Ok(&response_buf[..])
 }
 
 struct WaitReadyFuture<'a, I> {
